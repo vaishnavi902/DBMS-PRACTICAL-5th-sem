@@ -14,6 +14,7 @@ CREATE TABLE Salary_Backup (
     salary_difference NUMBER(10,2)
 );
 
+step1-------
 CREATE OR REPLACE TRIGGER trg_salary_backup
 AFTER UPDATE OF salary ON Employee
 FOR EACH ROW
@@ -27,11 +28,25 @@ BEGIN
     );
 END;
 /
-
 #----TEST CASE 1-----
 UPDATE Employee
 SET salary = 80000
 WHERE emp_id = 101;
 
 SELECT * FROM Salary_Backup;
+
+
+step2-------
+CREATE OR REPLACE TRIGGER trg_no_delete_ceo
+BEFORE DELETE ON Employee
+FOR EACH ROW
+BEGIN
+    IF UPPER(:OLD.designation) = 'CEO' THEN
+        RAISE_APPLICATION_ERROR(-20002, 'Error: Cannot delete CEO record!');
+    END IF;
+END;
+/
+#----TEST CASE 2-----
+DELETE FROM Employee WHERE emp_id = 103;
+
 
