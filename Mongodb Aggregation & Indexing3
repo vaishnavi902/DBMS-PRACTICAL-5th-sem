@@ -1,0 +1,40 @@
+#Collection Creation
+db.Movies_Data.insertMany([
+  { Movie_ID: 101, Movie_Name: "Inception", Director: "Christopher Nolan", Genre: "Sci-Fi", BoxOfficeCollection: 830 },
+  { Movie_ID: 102, Movie_Name: "Interstellar", Director: "Christopher Nolan", Genre: "Sci-Fi", BoxOfficeCollection: 950 },
+  { Movie_ID: 103, Movie_Name: "Tenet", Director: "Christopher Nolan", Genre: "Action", BoxOfficeCollection: 700 },
+  { Movie_ID: 104, Movie_Name: "Avatar", Director: "James Cameron", Genre: "Sci-Fi", BoxOfficeCollection: 2800 },
+  { Movie_ID: 105, Movie_Name: "Titanic", Director: "James Cameron", Genre: "Romance", BoxOfficeCollection: 2200 },
+  { Movie_ID: 106, Movie_Name: "Joker", Director: "Todd Phillips", Genre: "Drama", BoxOfficeCollection: 1100 },
+  { Movie_ID: 107, Movie_Name: "The Dark Knight", Director: "Christopher Nolan", Genre: "Action", BoxOfficeCollection: 1000 }
+])
+
+#1. Display how many Movies are directed by each Director
+db.Movies_Data.aggregate([
+  { $group: { _id: "$Director", Total_Movies: { $sum: 1 } } }
+])
+
+#2. Display Movies with the Highest BoxOfficeCollection in each Genre
+db.Movies_Data.aggregate([
+  { $group: { _id: "$Genre", HighestCollection: { $max: "$BoxOfficeCollection" } } }
+])
+
+#3. Display same list but in Ascending Order of BoxOfficeCollection
+db.Movies_Data.aggregate([
+  { $group: { _id: "$Genre", HighestCollection: { $max: "$BoxOfficeCollection" } } },
+  { $sort: { HighestCollection: 1 } }   // ascending order
+])
+
+INDEXING OPERATIONS
+#4. Create an index on field Movie_ID
+db.Movies_Data.createIndex({ Movie_ID: 1 })
+
+# 5. Create a compound index on Movie_Name and Director
+db.Movies_Data.createIndex({ Movie_Name: 1, Director: 1 })
+
+# 6. Drop an index on field Movie_ID
+db.Movies_Data.dropIndex({ Movie_ID: 1 })
+
+#7. Drop an index on fields Movie_Name and Director
+db.Movies_Data.dropIndex({ Movie_Name: 1, Director: 1 })
+
