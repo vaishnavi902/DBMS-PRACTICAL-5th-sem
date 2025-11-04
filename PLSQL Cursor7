@@ -1,0 +1,82 @@
+# To crete the Table PRODUCTS 
+CREATE TABLE Products (
+    Product_id NUMBER PRIMARY KEY,
+    Product_Name VARCHAR2(30),
+    Product_Type VARCHAR2(20),
+    Price NUMBER(10,2)
+);
+
+#----- PART 1 PARAMETERIZED CURSOR---->
+SET SERVEROUTPUT ON;
+
+DECLARE
+    v_min NUMBER := &min_price;
+    v_max NUMBER := &max_price;
+
+    CURSOR c_apparel (p_min NUMBER, p_max NUMBER) IS
+        SELECT Product_id, Product_Name, Product_Type, Price
+        FROM Products
+        WHERE Product_Type = 'Apparel'
+          AND Price BETWEEN p_min AND p_max;
+
+    v_pid Products.Product_id%TYPE;
+    v_pname Products.Product_Name%TYPE;
+    v_ptype Products.Product_Type%TYPE;
+    v_price Products.Price%TYPE;
+
+BEGIN
+    OPEN c_apparel(v_min, v_max);
+    LOOP
+        FETCH c_apparel INTO v_pid, v_pname, v_ptype, v_price;
+        EXIT WHEN c_apparel%NOTFOUND;
+
+        DBMS_OUTPUT.PUT_LINE('ID: ' || v_pid ||
+                             ' | Name: ' || v_pname ||
+                             ' | Type: ' || v_ptype ||
+                             ' | Price: ' || v_price);
+    END LOOP;
+    CLOSE c_apparel;
+END;
+/
+
+#----- PART 1 EXPLICIT CURSOR---->
+SET SERVEROUTPUT ON;
+
+DECLARE
+    CURSOR c_highprice IS
+        SELECT Product_id, Product_Name, Product_Type, Price
+        FROM Products
+        WHERE Price > 5000;
+
+    v_pid Products.Product_id%TYPE;
+    v_pname Products.Product_Name%TYPE;
+    v_ptype Products.Product_Type%TYPE;
+    v_price Products.Price%TYPE;
+
+BEGIN
+    OPEN c_highprice;
+    LOOP
+        FETCH c_highprice INTO v_pid, v_pname, v_ptype, v_price;
+        EXIT WHEN c_highprice%NOTFOUND;
+
+        DBMS_OUTPUT.PUT_LINE('ID: ' || v_pid ||
+                             ' | Name: ' || v_pname ||
+                             ' | Type: ' || v_ptype ||
+                             ' | Price: ' || v_price);
+    END LOOP;
+    CLOSE c_highprice;
+END;
+/
+
+#----- PART 1 IMPLICIT CURSOR---->
+SET SERVEROUTPUT ON;
+
+BEGIN
+    UPDATE Products
+    SET Price = Price + 1000;
+
+    DBMS_OUTPUT.PUT_LINE('✅ Price updated for ' || SQL%ROWCOUNT || ' products.');
+END;
+/
+
+
