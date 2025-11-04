@@ -1,0 +1,65 @@
+#To create the ACCOUNT table
+CREATE TABLE Account (
+    Account_No NUMBER PRIMARY KEY,
+    Cust_Name VARCHAR2(30),
+    Balance NUMBER(10,2),
+    NoOfYears NUMBER(3)
+);
+#To create the Earned_Interest Table 
+CREATE TABLE Earned_Interest (
+    Account_No NUMBER REFERENCES Account(Account_No),
+    Interest_Amt NUMBER(10,2)
+);
+
+
+SET SERVEROUTPUT ON;
+
+CREATE OR REPLACE PROCEDURE calc_interest (
+    p_acc_no IN NUMBER,
+    p_rate IN NUMBER
+)
+IS
+    v_balance Account.Balance%TYPE;
+    v_years Account.NoOfYears%TYPE;
+    v_interest NUMBER(10,2);
+
+    e_no_account EXCEPTION;  -- user-defined exception
+
+BEGIN
+    -- Fetch details of given account
+    SELECT Balance, NoOfYears INTO v_balance, v_years
+    FROM Account
+    WHERE Account_No = p_acc_no;
+
+    -- Calculate simple interest
+    v_interest := (v_balance * p_rate * v_years) / 100;
+
+    -- Insert into Earned_Interest table
+    INSERT INTO Earned_Interest VALUES (p_acc_no, v_interest);
+
+    DBMS_OUTPUT.PUT_LINE('✅ Interest calculated successfully!');
+    DBMS_OUTPUT.PUT_LINE('Account No: ' || p_acc_no);
+    DBMS_OUTPUT.PUT_LINE('Balance: ' || v_balance);
+    DBMS_OUTPUT.PUT_LINE('Years: ' || v_years);
+    DBMS_OUTPUT.PUT_LINE('Interest Rate: ' || p_rate || '%');
+    DBMS_OUTPUT.PUT_LINE('Interest Amount: ' || v_interest);
+    
+    COMMIT;
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('❌ No account found with number ' || p_acc_no);
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('⚠️ Error: ' || SQLERRM);
+END calc_interest;
+/
+
+#EXECUTION (USER-DRIVEN CALL)
+DECLARE
+    v_acc_no NUMBER := &Account_No;
+    v_rate NUMBER := &Interest_Rate;
+BEGIN
+    calc_interest(v_acc_no, v_rate);
+END;
+/
+
