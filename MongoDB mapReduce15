@@ -1,0 +1,80 @@
+#-------Step 1 — Create Collection and Insert Sample Data
+db.Book.insertMany([
+  { Title: "Python Basics", Author_name: "Vaishnavi Ghadge", Borrowed_status: true, Price: 350 },
+  { Title: "AI Fundamentals", Author_name: "Vaishnavi Ghadge", Borrowed_status: false, Price: 450 },
+  { Title: "MongoDB Mastery", Author_name: "Amit Patil", Borrowed_status: true, Price: 280 },
+  { Title: "Cloud Computing", Author_name: "Sneha Deshmukh", Borrowed_status: true, Price: 500 },
+  { Title: "Data Science with R", Author_name: "Amit Patil", Borrowed_status: false, Price: 600 },
+  { Title: "DBMS Concepts", Author_name: "Rohit Joshi", Borrowed_status: true, Price: 320 }
+])
+
+#------Step 2 — MapReduce Queries
+1️⃣ Display Author-wise List of Books
+
+✅ Map Function
+var mapFunction1 = function() {
+  emit(this.Author_name, this.Title);
+};
+
+✅ Reduce Function
+var reduceFunction1 = function(keyAuthor, valuesBooks) {
+  return valuesBooks;
+};
+
+✅ Execute MapReduce
+db.Book.mapReduce(
+  mapFunction1,
+  reduceFunction1,
+  { out: "Author_Books_List" }
+);
+
+db.Author_Books_List.find().pretty();
+
+2️⃣ Display Author-wise List of Books having Borrowed_status = “True”
+
+1.Map Function
+var mapFunction2 = function() {
+  if (this.Borrowed_status == true) {
+    emit(this.Author_name, this.Title);
+  }
+};
+
+✅ Reduce Function
+var reduceFunction2 = function(keyAuthor, valuesBooks) {
+  return valuesBooks;
+};
+
+✅ Execute MapReduce
+db.Book.mapReduce(
+  mapFunction2,
+  reduceFunction2,
+  { out: "Borrowed_Books_By_Author" }
+);
+
+db.Borrowed_Books_By_Author.find().pretty();
+
+3️⃣ Display Author-wise List of Books having Price > 300
+
+✅ Map Function
+var mapFunction3 = function() {
+  if (this.Price > 300) {
+    emit(this.Author_name, this.Title);
+  }
+};
+
+✅ Reduce Function
+var reduceFunction3 = function(keyAuthor, valuesBooks) {
+  return valuesBooks;
+};
+
+✅ Execute MapReduce
+db.Book.mapReduce(
+  mapFunction3,
+  reduceFunction3,
+  { out: "High_Price_Books_By_Author" }
+);
+
+db.High_Price_Books_By_Author.find().pretty();
+
+
+
