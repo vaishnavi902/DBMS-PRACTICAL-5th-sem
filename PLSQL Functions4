@@ -1,0 +1,53 @@
+# To create the Account table
+CREATE TABLE Account (
+    Account_No NUMBER PRIMARY KEY,
+    Cust_Name VARCHAR2(30),
+    Balance NUMBER(10,2),
+    NoOfYears NUMBER(3)
+);
+
+
+SET SERVEROUTPUT ON;
+
+CREATE OR REPLACE FUNCTION show_high_balance_accounts
+RETURN NUMBER
+IS
+    v_count NUMBER := 0;
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('--- Accounts Having Balance > 50000 ---');
+    DBMS_OUTPUT.PUT_LINE('----------------------------------------');
+
+    FOR rec IN (SELECT Account_No, Cust_Name, Balance, NoOfYears
+                FROM Account
+                WHERE Balance > 50000)
+    LOOP
+        v_count := v_count + 1;
+        DBMS_OUTPUT.PUT_LINE('Account No : ' || rec.Account_No);
+        DBMS_OUTPUT.PUT_LINE('Customer   : ' || rec.Cust_Name);
+        DBMS_OUTPUT.PUT_LINE('Balance    : ' || rec.Balance);
+        DBMS_OUTPUT.PUT_LINE('Years      : ' || rec.NoOfYears);
+        DBMS_OUTPUT.PUT_LINE('----------------------------------------');
+    END LOOP;
+
+    DBMS_OUTPUT.PUT_LINE('Total Accounts Found: ' || v_count);
+
+    RETURN v_count;
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('❌ No accounts found with balance greater than 50000');
+        RETURN 0;
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('⚠️ Error: ' || SQLERRM);
+        RETURN -1;
+END;
+/
+
+#Execution Calling the Functions
+DECLARE
+    v_result NUMBER;
+BEGIN
+    v_result := show_high_balance_accounts;
+    DBMS_OUTPUT.PUT_LINE('Function Returned Count = ' || v_result);
+END;
+/
