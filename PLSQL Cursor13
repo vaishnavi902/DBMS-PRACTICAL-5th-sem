@@ -1,0 +1,74 @@
+-- Table Creation
+CREATE TABLE Employee (
+    Emp_id      NUMBER(5),
+    Emp_Name    VARCHAR2(50),
+    Salary      NUMBER(10,2)
+);
+
+-- Sample Data
+INSERT INTO Employee VALUES (101, 'Vaishnavi', 75000);
+INSERT INTO Employee VALUES (102, 'Rohan', 45000);
+INSERT INTO Employee VALUES (103, 'Sneha', 55000);
+INSERT INTO Employee VALUES (104, 'Amit', 25000);
+INSERT INTO Employee VALUES (105, 'Karan', 60000);
+
+COMMIT;
+
+#--------1) Explicit Cursor----->
+SET SERVEROUTPUT ON;
+
+DECLARE
+    CURSOR emp_cur IS
+        SELECT Emp_id, Emp_Name, Salary
+        FROM Employee
+        WHERE Salary > 50000;
+
+    v_id     Employee.Emp_id%TYPE;
+    v_name   Employee.Emp_Name%TYPE;
+    v_salary Employee.Salary%TYPE;
+BEGIN
+    OPEN emp_cur;
+    LOOP
+        FETCH emp_cur INTO v_id, v_name, v_salary;
+        EXIT WHEN emp_cur%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE('ID: ' || v_id || ' | Name: ' || v_name || ' | Salary: ' || v_salary);
+    END LOOP;
+    CLOSE emp_cur;
+END;
+/
+
+#--------2) Implicit Cursor----->
+SET SERVEROUTPUT ON;
+
+DECLARE
+    v_total NUMBER;
+BEGIN
+    SELECT COUNT(*) INTO v_total FROM Employee;
+    DBMS_OUTPUT.PUT_LINE('Total number of employees: ' || v_total);
+END;
+/
+
+
+#--------3) Parameterized Cursor----->
+SET SERVEROUTPUT ON;
+
+DECLARE
+    v_empid Employee.Emp_id%TYPE := &Enter_Emp_ID;
+    v_name  Employee.Emp_Name%TYPE;
+    v_sal   Employee.Salary%TYPE;
+
+    CURSOR c_emp(p_id Employee.Emp_id%TYPE) IS
+        SELECT Emp_Name, Salary FROM Employee WHERE Emp_id = p_id;
+BEGIN
+    OPEN c_emp(v_empid);
+    FETCH c_emp INTO v_name, v_sal;
+    IF c_emp%FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('Employee Name: ' || v_name || ' | Salary: ' || v_sal);
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('No employee found with ID ' || v_empid);
+    END IF;
+    CLOSE c_emp;
+END;
+/
+
+
