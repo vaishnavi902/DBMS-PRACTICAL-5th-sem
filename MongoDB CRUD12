@@ -1,0 +1,24 @@
+#------Step 1 — Insert Documents
+db.Social_Media.insertMany([
+  { User_Id: 1, User_Name: "Vaishnavi", No_of_Posts: 120, No_of_Friends: 8, Friends_List: ["Sneha","Amit","Rohit","Sakshi"], Interests: ["Travel","Music","Coding"] },
+  { User_Id: 2, User_Name: "Sneha", No_of_Posts: 80, No_of_Friends: 4, Friends_List: ["Vaishnavi","Amit"], Interests: ["Dance","Movies"] },
+  { User_Id: 3, User_Name: "Amit", No_of_Posts: 150, No_of_Friends: 10, Friends_List: ["Sneha","Rohit","Priya","Kiran","Megha"], Interests: ["Gaming","AI","Reading"] },
+  { User_Id: 4, User_Name: "Rohit", No_of_Posts: 60, No_of_Friends: 3, Friends_List: ["Amit","Sneha"], Interests: ["Sports","Music"] },
+  { User_Id: 5, User_Name: "Priya", No_of_Posts: 200, No_of_Friends: 9, Friends_List: ["Amit","Rohit","Kiran","Sakshi","Vaishnavi"], Interests: ["Travel","Photography"] }
+])
+
+#-----Step 2 — Queries
+1️⃣ List all users from collection Social_Media in formatted manner
+db.Social_Media.find().pretty()
+
+2️⃣ Find all users having number of posts greater than 100
+db.Social_Media.find({ No_of_Posts: { $gt: 100 } }, { _id: 0, User_Name: 1, No_of_Posts: 1 })
+
+3️⃣ List the user names and their respective Friends_List
+db.Social_Media.find({}, { _id: 0, User_Name: 1, Friends_List: 1 })
+
+4️⃣ Display the user ids and Friends list of users who have more than 5 friends
+db.Social_Media.find({ No_of_Friends: { $gt: 5 } }, { _id: 0, User_Id: 1, Friends_List: 1 })
+
+5️⃣ Display all users with number of posts in descending order
+db.Social_Media.find({}, { _id: 0, User_Name: 1, No_of_Posts: 1 }).sort({ No_of_Posts: -1 })
