@@ -1,0 +1,98 @@
+#-------step 1
+CREATE TABLE Manager (
+    Manager_id INT PRIMARY KEY,
+    Manager_name VARCHAR(50)
+);
+
+CREATE TABLE Departments (
+    Department_id INT PRIMARY KEY,
+    Department_name VARCHAR(50),
+    Manager_id INT,
+    Location_id INT,
+    FOREIGN KEY (Manager_id) REFERENCES Manager(Manager_id)
+);
+
+CREATE TABLE Locations (
+    Location_id INT PRIMARY KEY,
+    Street_address VARCHAR(100),
+    Postal_code VARCHAR(10),
+    city VARCHAR(50),
+    state VARCHAR(50),
+    Country_id VARCHAR(10)
+);
+
+CREATE TABLE Employee (
+    Employee_id INT PRIMARY KEY,
+    First_name VARCHAR(50),
+    Last_name VARCHAR(50),
+    Hire_date DATE,
+    Salary DECIMAL(10,2),
+    Job_title VARCHAR(50),
+    Manager_id INT,
+    Department_id INT,
+    FOREIGN KEY (Manager_id) REFERENCES Manager(Manager_id),
+    FOREIGN KEY (Department_id) REFERENCES Departments(Department_id)
+);
+
+#--------step2---
+INSERT SAMPLE DATA
+INSERT INTO Manager VALUES 
+(1, 'Amit Sharma'),
+(2, 'Priya Mehta'),
+(3, 'Ravi Patil');
+
+INSERT INTO Locations VALUES 
+(101, 'MG Road', '411001', 'Pune', 'Maharashtra', 'IN'),
+(102, 'Bandra', '400050', 'Mumbai', 'Maharashtra', 'IN'),
+(103, 'Whitefield', '560066', 'Bangalore', 'Karnataka', 'IN');
+
+INSERT INTO Departments VALUES 
+(10, 'IT', 1, 101),
+(20, 'HR', 2, 102),
+(30, 'Finance', 3, 103);
+
+INSERT INTO Employee VALUES
+(1001, 'Vaishnavi', 'Ghadge', '2012-06-10', 75000, 'Developer', 1, 10),
+(1002, 'Rohan', 'Deshmukh', '2015-04-22', 55000, 'Tester', 1, 10),
+(1003, 'Sneha', 'Patil', '2010-08-15', 95000, 'Manager', 2, 20),
+(1004, 'Karan', 'Joshi', '2008-09-05', 120000, 'Accountant', 3, 30),
+(1005, 'Aditi', 'Naik', '2020-01-12', 48000, 'Intern', 1, 10);
+
+
+#Q1. Employees earning more than average salary & working in IT department
+SELECT e.First_name, e.Last_name, e.Salary
+FROM Employee e
+JOIN Departments d ON e.Department_id = d.Department_id
+WHERE e.Salary > (SELECT AVG(Salary) FROM Employee)
+  AND d.Department_name = 'IT';
+
+#Q2. Employees earning same as minimum salary for all departments
+SELECT First_name, Last_name, Salary
+FROM Employee
+WHERE Salary IN (
+    SELECT MIN(Salary)
+    FROM Employee
+    GROUP BY Department_id
+);
+
+#Q3. Employees whose salary is above average for their own department
+SELECT e.Employee_id, e.First_name, e.Last_name, e.Salary
+FROM Employee e
+WHERE e.Salary > (
+    SELECT AVG(Salary)
+    FROM Employee
+    WHERE Department_id = e.Department_id
+);
+
+#Q4. Display Department name, Manager name, and City
+SELECT d.Department_name, m.Manager_name, l.city
+FROM Departments d
+JOIN Manager m ON d.Manager_id = m.Manager_id
+JOIN Locations l ON d.Location_id = l.Location_id;
+
+# Q5. Managers with experience > 15 years
+SELECT e.First_name, e.Last_name, e.Hire_date, e.Salary
+FROM Employee e
+WHERE e.Job_title = 'Manager'
+  AND TIMESTAMPDIFF(YEAR, e.Hire_date, CURDATE()) > 15;
+
