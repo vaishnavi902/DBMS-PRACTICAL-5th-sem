@@ -1,0 +1,82 @@
+#Collection:
+db.Student.insertMany([
+  { roll_no: 1, name: "Vaishnavi", class: "TE", dept: "Computer", aggregate_marks: 85 },
+  { roll_no: 2, name: "Sneha", class: "TE", dept: "IT", aggregate_marks: 78 },
+  { roll_no: 3, name: "Rohit", class: "SE", dept: "Computer", aggregate_marks: 65 },
+  { roll_no: 4, name: "Aditya", class: "SE", dept: "Mechanical", aggregate_marks: 72 },
+  { roll_no: 5, name: "Priya", class: "BE", dept: "Computer", aggregate_marks: 88 },
+  { roll_no: 6, name: "Amit", class: "BE", dept: "IT", aggregate_marks: 91 }
+]);
+
+1️⃣ Finding the Total Marks of Students of “TE” Class Department-wise 
+
+✅ Map Function
+var mapFunction1 = function() {
+  if (this.class == "TE") {
+    emit(this.dept, this.aggregate_marks);
+  }
+};
+
+✅ Reduce Function
+var reduceFunction1 = function(keyDept, valuesMarks) {
+  return Array.sum(valuesMarks);
+};
+
+✅ Execute MapReduce
+db.Student.mapReduce(
+  mapFunction1,
+  reduceFunction1,
+  { out: "Total_Marks_TE" }
+);
+
+db.Total_Marks_TE.find().pretty();
+
+
+2️⃣ Finding the Highest Marks of Students of “SE” Class Department-wise
+
+✅ Map Function
+var mapFunction2 = function() {
+  if (this.class == "SE") {
+    emit(this.dept, this.aggregate_marks);
+  }
+};
+
+✅ Reduce Function
+var reduceFunction2 = function(keyDept, valuesMarks) {
+  return Math.max.apply(Math, valuesMarks);
+};
+
+✅ Execute MapReduce
+db.Student.mapReduce(
+  mapFunction2,
+  reduceFunction2,
+  { out: "Highest_Marks_SE" }
+);
+db.Highest_Marks_SE.find().pretty();
+
+
+3️⃣ Finding Average Marks of Students of “BE” Class Department-wise
+
+✅ Map Function
+var mapFunction3 = function() {
+  if (this.class == "BE") {
+    emit(this.dept, this.aggregate_marks);
+  }
+};
+
+✅ Reduce Function
+var reduceFunction3 = function(keyDept, valuesMarks) {
+  var total = Array.sum(valuesMarks);
+  var count = valuesMarks.length;
+  return total / count;
+};
+
+✅ Execute MapReduce
+db.Student.mapReduce(
+  mapFunction3,
+  reduceFunction3,
+  { out: "Average_Marks_BE" }
+);
+
+db.Average_Marks_BE.find().pretty();
+
